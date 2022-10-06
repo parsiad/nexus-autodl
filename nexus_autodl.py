@@ -2,12 +2,15 @@
 
 # pylint: disable=missing-module-docstring
 
+from typing import List, NamedTuple
 import os
 import logging
 import random
+import re
 import sys
 import time
 
+from numpy import ndarray as NDArray
 import click
 import cv2 as cv  # type: ignore
 import numpy as np
@@ -30,47 +33,62 @@ def run(sleep_max: float, sleep_min: float) -> None:  # pylint: disable=missing-
         sleep_seconds = random.uniform(sleep_min, sleep_max)
         logging.info('Sleeping for %f seconds', sleep_seconds)
         time.sleep(sleep_seconds)
-        _find_and_click(templates)
+        try:
+            _find_and_click(templates)
+        except cv.error:
+            logging.info('Ignoring OpenCV error')
+            pass
 
 
-def _find_and_click(templates: dict[str, np.ndarray]) -> None:
+class _Template(NamedTuple):
+    array: NDArray
+    name: str
+    threshold: int
+
+
+def _find_and_click(templates: List[_Template]) -> None:
     screenshot_image = pyautogui.screenshot()
     screenshot = _image_to_grayscale_array(screenshot_image)
-    for name, template in templates.items():
+    for template in templates:
         sift = cv.SIFT_create()  # pylint: disable=no-member
-        _, template_descriptors = sift.detectAndCompute(template, mask=None)
+        _, template_descriptors = sift.detectAndCompute(template.array, mask=None)
         screenshot_keypoints, screenshot_descriptors = sift.detectAndCompute(screenshot, mask=None)
         matcher = cv.BFMatcher()  # pylint: disable=no-member
         matches = matcher.knnMatch(template_descriptors, screenshot_descriptors, k=2)
-        points = np.array([screenshot_keypoints[m.trainIdx].pt for m, n in matches if m.distance < 0.5 * n.distance])
+        points = np.array([screenshot_keypoints[m.trainIdx].pt for m, _ in matches if m.distance < template.threshold])
         if points.shape[0] == 0:
             continue
         point = np.median(points, axis=0)
         pyautogui.click(*point)
-        logging.info('Clicking on %s at coordinates x=%f y=%f', name, *point)
-        break
+        logging.info('Clicking on %s at coordinates x=%f y=%f', template.name, *point)
+        return
     logging.info('No matches found')
 
 
-def _get_templates() -> dict[str, np.ndarray]:
-    arrays = {}
+def _get_templates() -> List[_Template]:
+    templates = []
     try:
         # pylint: disable=no-member,protected-access
         root_dir = sys._MEIPASS  # type: ignore
-    except NameError:
+    except AttributeError:
         root_dir = '.'
     templates_dir = os.path.join(root_dir, 'templates')
+    pattern = re.compile(r'^([1-9][0-9]*)_([1-9][0-9]*)_(.+)\.png$')
     basenames = os.listdir(templates_dir)
-    for basename in basenames:
-        name, _ = os.path.splitext(basename)
-        path = os.path.join(templates_dir, basename)
+    matches = (pattern.match(basename) for basename in basenames)
+    filtered_matches = (match for match in matches if match is not None)
+    groups = (match.groups() for match in filtered_matches)
+    sorted_groups = sorted(groups, key=lambda t: int(t[0]))
+    for index, threshold, name in sorted_groups:
+        path = os.path.join(templates_dir, f'{index}_{threshold}_{name}.png')
         image = PIL.Image.open(path)  # pylint: disable=no-member
         array = _image_to_grayscale_array(image)
-        arrays[name] = array
-    return arrays
+        template = _Template(array=array, name=name, threshold=int(threshold))
+        templates.append(template)
+    return templates
 
 
-def _image_to_grayscale_array(image: PIL.Image.Image) -> np.ndarray:
+def _image_to_grayscale_array(image: PIL.Image.Image) -> NDArray:
     image = PIL.ImageOps.grayscale(image)
     array = np.array(image)
     return array
