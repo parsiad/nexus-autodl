@@ -59,8 +59,11 @@ def _find_and_click(templates: List[_Template]) -> None:
         if points.shape[0] == 0:
             continue
         point = np.median(points, axis=0)
+        current_mouse_pos = pyautogui.position()
+        logging.info('Saving current mouse position at x=%f y=%f', *current_mouse_pos)
         pyautogui.click(*point)
         logging.info('Clicking on %s at coordinates x=%f y=%f', template.name, *point)
+        pyautogui.moveTo(*current_mouse_pos)
         return
     logging.info('No matches found')
 
