@@ -14,8 +14,8 @@ from numpy import ndarray as NDArray
 import click
 import cv2 as cv  # type: ignore
 import numpy as np
-import PIL
-import PIL.ImageOps
+import PIL  # type: ignore
+import PIL.ImageOps  # type: ignore
 import pyautogui  # type: ignore
 
 
@@ -35,9 +35,8 @@ def run(sleep_max: float, sleep_min: float) -> None:  # pylint: disable=missing-
         time.sleep(sleep_seconds)
         try:
             _find_and_click(templates)
-        except cv.error:
+        except cv.error:  # pylint: disable=no-member
             logging.info('Ignoring OpenCV error')
-            pass
 
 
 class _Template(NamedTuple):
@@ -68,11 +67,10 @@ def _find_and_click(templates: List[_Template]) -> None:
     logging.info('No matches found')
 
 
-def _get_templates() -> List[_Template]:
+def _get_templates() -> List[_Template]:  # pylint: disable=too-many-locals
     templates = []
     try:
-        # pylint: disable=no-member,protected-access
-        root_dir = sys._MEIPASS  # type: ignore
+        root_dir = sys._MEIPASS  # type: ignore  # pylint: disable=no-member,protected-access
     except AttributeError:
         root_dir = '.'
     templates_dir = os.path.join(root_dir, 'templates')
