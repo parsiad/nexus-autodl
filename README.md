@@ -47,4 +47,5 @@ or use
 ```
 C://path//to//make.exe path//to//makefile
 ```
+#### you can replace the images in templates folder and build the project in case nexus decides to change their download button currently it is working as intended to download off of wabbajack
 #### current code requires python3.7 use opencv version 3.4.2.16 otherwise SIFT does not work could maybe fix using ORB function for newer OpenCV version
