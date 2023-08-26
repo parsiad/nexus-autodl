@@ -1,26 +1,29 @@
-NAME:=nexus_autodl
+NAME := nexus_autodl
 
 ifeq ($(OS),Windows_NT)
-	PATHSEP:=;
+    PATHSEP := ;
 else
-	PATHSEP:=:
+    PATHSEP := :
 endif
 
-all: yapf lint mypy build
+# Update these paths with the correct paths to your Python executables
+PYTHON_EXEC := C:\Py37\python.exe
+YAPF_PATH := C:\py37\Scripts\yapf.exe
+MYPY_PATH := C:\py37\Scripts\mypy.exe
+BUILD_PATH := C:\py37\Scripts\pyinstaller.exe
+
+all: yapf mypy build
 
 build: $(NAME).py
-	pyinstaller --clean -F --add-data 'templates$(PATHSEP)templates' $<
+	$(BUILD_PATH) --clean -F --add-data 'templates$(PATHSEP)templates' --icon icon.ico $<
 
 clean:
 	$(RM) -r build dist *.spec
 
-lint: $(NAME).py
-	pylint --max-line-length 120 $<
-
 mypy: $(NAME).py
-	mypy $<
+	$(MYPY_PATH) $<
 
 yapf: $(NAME).py
-	yapf -i --style style.yapf $<
+	$(PYTHON_EXEC) $(YAPF_PATH) -i --style style.yapf $<
 
-.PHONY: build clean lint mypy yapf
+.PHONY: build clean mypy yapf

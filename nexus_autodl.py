@@ -13,12 +13,13 @@ import time
 from numpy import ndarray as NDArray
 import click
 import cv2 as cv  # type: ignore
+# Import xfeatures2d from cv2 module
+from cv2 import xfeatures2d
 import numpy as np
-import PIL  # type: ignore
-import PIL.ImageOps  # type: ignore
 import pyautogui  # type: ignore
+from PIL import Image, ImageOps
 
-
+# ... (Previous click options and function comments remain the same)
 @click.command()
 @click.option('--sleep_max', default=5.)
 @click.option('--sleep_min', default=0.)
@@ -44,12 +45,13 @@ class _Template(NamedTuple):
     name: str
     threshold: int
 
-
+# Define the main function to find and click templates
 def _find_and_click(templates: List[_Template]) -> None:
     screenshot_image = pyautogui.screenshot()
     screenshot = _image_to_grayscale_array(screenshot_image)
     for template in templates:
-        sift = cv.SIFT_create()  # pylint: disable=no-member
+        # Change cv.SIFT_create() to cv.xfeatures2d.SIFT_create() to use xfeatures2d
+        sift = cv.xfeatures2d.SIFT_create()  # pylint: disable=no-member
         _, template_descriptors = sift.detectAndCompute(template.array, mask=None)
         screenshot_keypoints, screenshot_descriptors = sift.detectAndCompute(screenshot, mask=None)
         matcher = cv.BFMatcher()  # pylint: disable=no-member
@@ -66,9 +68,9 @@ def _find_and_click(templates: List[_Template]) -> None:
         return
     logging.info('No matches found')
 
-
+# ... (Previous _get_templates functions remain the same)
 def _get_templates() -> List[_Template]:  # pylint: disable=too-many-locals
-    templates = []
+    templates: List[_Template] = []  # Add the type annotation here
     try:
         root_dir = sys._MEIPASS  # type: ignore  # pylint: disable=no-member,protected-access
     except AttributeError:
@@ -82,18 +84,18 @@ def _get_templates() -> List[_Template]:  # pylint: disable=too-many-locals
     sorted_groups = sorted(groups, key=lambda t: int(t[0]))
     for index, threshold, name in sorted_groups:
         path = os.path.join(templates_dir, f'{index}_{threshold}_{name}.png')
-        image = PIL.Image.open(path)  # pylint: disable=no-member
+        image = Image.open(path)
         array = _image_to_grayscale_array(image)
         template = _Template(array=array, name=name, threshold=int(threshold))
         templates.append(template)
     return templates
 
-
-def _image_to_grayscale_array(image: PIL.Image.Image) -> NDArray:
-    image = PIL.ImageOps.grayscale(image)
+# ... (Previous _image_to_grayscale_array functions remain the same)
+def _image_to_grayscale_array(image: Image.Image) -> NDArray:
+    image = ImageOps.grayscale(image)
     array = np.array(image)
     return array
 
-
+# Execute the main function only if the script is run directly
 if __name__ == '__main__':
     run()  # pylint: disable=no-value-for-parameter
