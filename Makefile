@@ -7,10 +7,10 @@ else
 endif
 
 # Update these paths with the correct paths to your Python executables
-PYTHON_EXEC := C:\Py37\python.exe
-YAPF_PATH := C:\py37\Scripts\yapf.exe
-MYPY_PATH := C:\py37\Scripts\mypy.exe
-BUILD_PATH := C:\py37\Scripts\pyinstaller.exe
+PYTHON_EXEC := Path\\to\\python.exe
+YAPF_PATH := Path\\to\\yapf.exe
+MYPY_PATH := Path\\to\\mypy.exe
+BUILD_PATH := Path\\to\\pyinstaller.exe
 
 all: yapf mypy build
 
