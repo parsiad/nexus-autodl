@@ -13,9 +13,10 @@ Use this at your own risk.
 
 # Changelog
 ```
+Updated Readme.md
 Added an icon to the exe
-Changed code a little so as to make it buildable again
-Updated readme with build instructions
+Changed code a little so as to make it buildable 
+Added instructions to build the Program
 Added comments to the code
 ```
 ## Download
@@ -38,6 +39,12 @@ pip install opencv-contrib-python==3.4.2.16
 python -m pip install types-Pillow
 ```
 install Make from [GnuWin32](https://sourceforge.net/projects/gnuwin32/files/make/3.81/) and add the executable to PATH
-navigate to folder with makefile and run in powershell 
+navigate to folder with makefile 
+edit Makefile and add the Executables required inside
+run in powershell 
 ```make all```
-#### current requires python3.7 use opencv version 3.4.2.16 otherwise SIFT does not work could maybe fix using ORB function for newer OpenCV version
+or use 
+```
+C://path//to//make.exe path//to//makefile
+```
+#### current code requires python3.7 use opencv version 3.4.2.16 otherwise SIFT does not work could maybe fix using ORB function for newer OpenCV version
