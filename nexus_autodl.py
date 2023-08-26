@@ -19,18 +19,27 @@ import numpy as np
 import pyautogui  # type: ignore
 from PIL import Image, ImageOps
 
-# ... (Previous click options and function comments remain the same)
+
+# These define the main function that runs the autoclicker
 @click.command()
 @click.option('--sleep_max', default=5.)
 @click.option('--sleep_min', default=0.)
+# Main function that runs the autoclicker.
+# Args:
+#    sleep_max (float): Maximum sleep time between autoclicks.
+#    sleep_min (float): Minimum sleep time between autoclicks.
 def run(sleep_max: float, sleep_min: float) -> None:  # pylint: disable=missing-function-docstring
+
+    # Configure logging settings
     logging.basicConfig(
         datefmt='%m/%d/%Y %I:%M:%S %p',
         format='%(asctime)s [%(levelname)s] %(message)s',
         level=logging.INFO,
     )
-    templates = _get_templates()
+    templates = _get_templates()  # Get the list of template images
+    # Run the autoclicker in a loop
     while True:
+        # Generate a random sleep time
         sleep_seconds = random.uniform(sleep_min, sleep_max)
         logging.info('Sleeping for %f seconds', sleep_seconds)
         time.sleep(sleep_seconds)
@@ -40,12 +49,15 @@ def run(sleep_max: float, sleep_min: float) -> None:  # pylint: disable=missing-
             logging.info('Ignoring OpenCV error')
 
 
+# used to store information about a specific template image
 class _Template(NamedTuple):
     array: NDArray
     name: str
     threshold: int
 
-# Define the main function to find and click templates
+
+# Define the main function to find and click on templates
+# Find and click on matching templates in the screenshot.
 def _find_and_click(templates: List[_Template]) -> None:
     screenshot_image = pyautogui.screenshot()
     screenshot = _image_to_grayscale_array(screenshot_image)
@@ -68,7 +80,9 @@ def _find_and_click(templates: List[_Template]) -> None:
         return
     logging.info('No matches found')
 
-# ... (Previous _get_templates functions remain the same)
+
+# This responsible for retrieving and preparing template images that will be used for image matching within the Nexus AutoDL script.
+# basically retrieve a list of template images from the templates directory.
 def _get_templates() -> List[_Template]:  # pylint: disable=too-many-locals
     templates: List[_Template] = []  # Add the type annotation here
     try:
@@ -90,11 +104,13 @@ def _get_templates() -> List[_Template]:  # pylint: disable=too-many-locals
         templates.append(template)
     return templates
 
-# ... (Previous _image_to_grayscale_array functions remain the same)
+
+# Convert a PIL Image to a grayscale NumPy array.
 def _image_to_grayscale_array(image: Image.Image) -> NDArray:
     image = ImageOps.grayscale(image)
     array = np.array(image)
     return array
+
 
 # Execute the main function only if the script is run directly
 if __name__ == '__main__':
