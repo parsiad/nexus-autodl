@@ -12,11 +12,12 @@ Using a bot to download from Nexus is in direct violation of their TOS:
 Use this at your own risk.
 
 # Changelog
+```
 Added an icon to the exe
 Changed code a little so as to make it buildable again
 Updated readme with build instructions
 Added comments to the code
-
+```
 ## Download
 Check [Releases](https://github.com/Kickskii/fork-NexusAutodl/releases) 
 ## BuildingNexus-AutoDL
