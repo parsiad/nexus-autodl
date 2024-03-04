@@ -1,0 +1,5 @@
+opencv-contrib-python
+numpy
+pyautogui
+pillow
+click
