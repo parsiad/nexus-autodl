@@ -2,9 +2,11 @@
 
 import logging
 import random
+import re
 import sys
 import time
 from pathlib import Path
+from typing import Iterator
 
 import click
 import pyautogui
@@ -14,6 +16,15 @@ from pyautogui import ImageNotFoundException
 from pyscreeze import Box
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+
+
+def human_sorted(paths: Iterator[Path]) -> list[Path]:
+    pattern = re.compile("([0-9]+)")
+
+    def key(key: Path) -> tuple[int | str, ...]:
+        return tuple(int(c) if c.isdigit() else c for c in pattern.split(str(key)))
+
+    return sorted(paths, key=key)
 
 
 @click.command()
@@ -31,9 +42,10 @@ def main(
 ) -> None:
     templates_path_ = Path(templates_path)
     templates: dict[Path, Image] = {}
-    for template_path in templates_path_.rglob("*"):
+    for template_path in human_sorted(templates_path_.iterdir()):
         try:
             templates[template_path] = open_image(template_path)
+            logging.info(f"Loaded {template_path}")
         except UnidentifiedImageError:
             logging.info(f"{template_path} is not a valid image; skipping")
 
