@@ -15,9 +15,10 @@ If you like Nexus AutoDL, please leave a star on GitHub to help others find it.
 
 A Windows binary is available on the [releases page](https://github.com/parsiad/nexus-autodl/releases).
 Download it and double-click on it to start Nexus AutoDL.
-The first time you run the application, you will be presented with some instructions.
-Follow the instructions and relaunch it.
+Take a screenshot and crop (WIN+S on Windows) the item on the screen you want to click on, placing the result in a directory of your choice.
+Point Nexus AutoDL to this directory and press the **Start** button.
 This spawns a terminal window which you can close when you are done downloading mods.
+You can include multiple images in this directory.
 
 Users on other platforms can download the source code on GitHub.
 
