@@ -1,4 +1,3 @@
-import os
 import random
 import re
 from datetime import datetime
@@ -18,7 +17,6 @@ from tkinter import (
     Toplevel,
     Scrollbar,
     filedialog,
-    messagebox,
 )
 
 import pyautogui
@@ -66,17 +64,34 @@ class NexusAutoDL:
         self._log_text = None
         self._templates: dict[str, ImageFile] = {}
 
-    def _log(self, message: str) -> None:
+    def _log(self, message: str, fatal: bool = False) -> None:
         assert self._log_text is not None
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if fatal:
+            self._log_text.insert("end", "FATAL ", "fatal")
+        else:
+            self._log_text.insert("end", "INFO ", "info")
         self._log_text.insert("end", f"[{timestamp}] ", "timestamp")
         self._log_text.insert("end", f"{message}\n")
+        self._log_text.tag_config("fatal", foreground="red")
+        self._log_text.tag_config("info", foreground="orange")
         self._log_text.tag_config("timestamp", foreground="blue")
         self._log_text.yview_moveto(1)  # Scroll to the end
 
     def _match(self):
+        try:
+            self._match_impl()
+        except Exception as e:
+            self._log(str(e), fatal=True)
+
+    def _match_impl(self):
+        confidence = self._confidence.get()
+        grayscale = self._grayscale.get()
+        min_sleep_seconds = self._min_sleep_seconds.get()
+        max_sleep_seconds = self._max_sleep_seconds.get()
+
         if len(self._templates) == 0:
-            self._log(f"No valid images found in {self._templates_path.get()}.")
+            self._log(f"No valid images found in {self._templates_path.get()}", fatal=True)
             return
 
         screenshot = pyautogui.screenshot()
@@ -86,15 +101,9 @@ class NexusAutoDL:
 
             box = None
             try:
-                box = pyautogui.locate(
-                    template_image,
-                    screenshot,
-                    grayscale=self._grayscale.get(),
-                    confidence=self._confidence.get(),
-                )
+                box = pyautogui.locate(template_image, screenshot, confidence=confidence, grayscale=grayscale)
             except pyautogui.ImageNotFoundException:
                 pass
-
             if not box:
                 continue
 
@@ -103,7 +112,7 @@ class NexusAutoDL:
             self._log(f"Matched at ({match_x}, {match_y}).")
             break
 
-        sleep_interval = random.uniform(self._min_sleep_seconds.get(), self._max_sleep_seconds.get())
+        sleep_interval = random.uniform(min_sleep_seconds, max_sleep_seconds)
         self._log(f"Waiting for {sleep_interval:.2f} seconds.")
         self._root.after(int(sleep_interval * 1000), self._match)
 
@@ -145,6 +154,8 @@ class NexusAutoDL:
                 self._log(f"Skipping directory {template_path}")
             except UnidentifiedImageError:
                 self._log(f"Skipping non-image {template_path}")
+            except Exception as e:
+                self._log(str(e), fatal=True)
 
         self._match()
 
