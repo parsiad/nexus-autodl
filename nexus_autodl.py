@@ -41,6 +41,7 @@ def main(
     templates_path: str,
 ) -> None:
     templates_path_ = Path(templates_path)
+    templates_path_.mkdir(exist_ok=True)
     templates: dict[Path, Image] = {}
     for template_path in human_sorted(templates_path_.iterdir()):
         try:
