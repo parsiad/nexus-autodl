@@ -3,7 +3,7 @@ NAME:=nexus_autodl
 all: build
 
 build: $(NAME).py
-	pyinstaller --clean -F $<
+	pyinstaller --clean --noconsole -F $<
 
 clean:
 	$(RM) -r build dist *.spec
