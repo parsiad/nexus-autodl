@@ -18,11 +18,21 @@ from tkinter import (
     Scrollbar,
     filedialog,
 )
+from typing import Any
 
 import pyautogui
 from PIL import UnidentifiedImageError
 from PIL.Image import open as open_image
 from PIL.ImageFile import ImageFile
+
+try:
+    import cv2
+
+    del cv2
+
+    has_cv2 = True
+except ImportError:
+    has_cv2 = False
 
 _INTEGER_PATTERN = re.compile("([0-9]+)")
 
@@ -90,6 +100,10 @@ class NexusAutoDL:
         min_sleep_seconds = self._min_sleep_seconds.get()
         max_sleep_seconds = self._max_sleep_seconds.get()
 
+        kwargs: dict[str, Any] = {}
+        if has_cv2:
+            kwargs["confidence"] = confidence
+
         if len(self._templates) == 0:
             self._log(f"No valid images found in {self._templates_path.get()}", fatal=True)
             return
@@ -101,7 +115,7 @@ class NexusAutoDL:
 
             box = None
             try:
-                box = pyautogui.locate(template_image, screenshot, confidence=confidence, grayscale=grayscale)
+                box = pyautogui.locate(template_image, screenshot, grayscale=grayscale, **kwargs)
             except pyautogui.ImageNotFoundException:
                 pass
             if not box:
@@ -156,6 +170,9 @@ class NexusAutoDL:
                 self._log(f"Skipping non-image {template_path}")
             except Exception as e:
                 self._log(str(e), fatal=True)
+
+        if not has_cv2:
+            self._log("Unable to import OpenCV; ignoring confidence argument")
 
         self._match()
 
