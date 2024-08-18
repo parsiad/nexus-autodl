@@ -134,8 +134,11 @@ class NexusAutoDL:
         abspath = filedialog.askdirectory()
         if not abspath:
             return
-        relpath = str(Path(abspath).relative_to(Path.cwd()))
-        self._templates_path.set(relpath)
+        try:
+            path = str(Path(abspath).relative_to(Path.cwd()))
+        except ValueError:
+            path = abspath
+        self._templates_path.set(path)
 
     def _start(self):
         self._root.withdraw()  # Close the current window
