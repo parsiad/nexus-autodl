@@ -21,6 +21,33 @@ This spawns a terminal window which you can close when you are done downloading 
 
 Users on other platforms can download the source code on GitHub.
 
+## Usage
+
+```text
+nexus_autodl.py [OPTIONS]
+
+Options:
+  --confidence FLOAT              Specifies the accuracy with which the script 
+                                  should find the screenshot button [default:0.7]
+  --grayscale / --color           Try to locate button using only desaturated
+                                  images, can speed up the locating action
+                                  [default: grayscale]
+  --min-sleep-interval INTEGER    Minumal amount of time to wait between every
+                                  click attempt  [default: 1]
+  --max-sleep-interval INTEGER    Minumal amount of time to wait between every
+                                  click attempt  [default: 5]
+  --retries-before-scroll INTEGER
+                                  Amount of failed attemps before trying to
+                                  scroll down  [default: 3]
+  --disable-transparent-ads-fix BOOLEAN
+                                  Disable the functionality that can
+                                  potentially locate transparent ads which
+                                  prevent clicking  [default: False]
+  --templates-path TEXT           Set a path to the folder with button screenshots
+                                  [default: <current dir>\templates]
+  --help                          Show this message and exit.
+```
+
 ## Caution
 
 Using a bot to download from Nexus is in direct violation of their TOS:
