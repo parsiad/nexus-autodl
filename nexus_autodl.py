@@ -121,9 +121,11 @@ class NexusAutoDL:
             if not box:
                 continue
 
+            initial_position = pyautogui.position()
             match_x, match_y = pyautogui.center(box)
             pyautogui.click(match_x, match_y)
             self._log(f"Matched at ({match_x}, {match_y}).")
+            pyautogui.moveTo(initial_position)
             break
 
         sleep_interval = random.uniform(min_sleep_seconds, max_sleep_seconds)
