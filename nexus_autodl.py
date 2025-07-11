@@ -52,6 +52,7 @@ class NexusAutoDL:
         self._min_sleep_seconds = IntVar(value=1)
         self._max_sleep_seconds = IntVar(value=5)
         self._templates_path = StringVar(value="templates")
+        self._scroll_amount = IntVar(value=0)
 
         Label(root, text="Confidence:").grid(row=0, column=0, sticky="w")
         Entry(root, textvariable=self._confidence).grid(row=0, column=1)
@@ -69,7 +70,10 @@ class NexusAutoDL:
         Label(root, text="Grayscale:").grid(row=4, column=0, sticky="w")
         Checkbutton(root, variable=self._grayscale).grid(row=4, column=1)
 
-        Button(root, text="Start", command=self._start).grid(row=5, column=0, columnspan=3)
+        Label(root, text="Scroll amount (in clicks negative for up, positive for down):").grid(row=5, column=0, sticky="w")
+        Entry(root, textvariable=self._scroll_amount).grid(row=5, column=1)
+
+        Button(root, text="Start", command=self._start).grid(row=6, column=0, columnspan=3)
 
         self._log_text = None
         self._templates: dict[str, ImageFile] = {}
@@ -99,6 +103,7 @@ class NexusAutoDL:
         grayscale = self._grayscale.get()
         min_sleep_seconds = self._min_sleep_seconds.get()
         max_sleep_seconds = self._max_sleep_seconds.get()
+        scroll_ammount = self._scroll_amount.get()
 
         kwargs: dict[str, Any] = {}
         if has_cv2:
@@ -130,6 +135,8 @@ class NexusAutoDL:
 
         sleep_interval = random.uniform(min_sleep_seconds, max_sleep_seconds)
         self._log(f"Waiting for {sleep_interval:.2f} seconds.")
+        pyautogui.scroll(scroll_ammount)
+        self._log(f"Scrolled {scroll_ammount} clicks.")
         self._root.after(int(sleep_interval * 1000), self._match)
 
     def _select(self) -> None:
