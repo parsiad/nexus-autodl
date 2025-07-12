@@ -65,13 +65,14 @@ class NexusAutoDL:
 
         Label(root, text="Templates directory:").grid(row=3, column=0, sticky="w")
         Entry(root, state="readonly", textvariable=self._templates_path).grid(row=3, column=1)
-        Button(root, text="...", command=self._select).grid(row=3, column=2)
+        Button(root, text="...", command=self._select).grid(row=3, column=2, sticky="w")
 
         Label(root, text="Grayscale:").grid(row=4, column=0, sticky="w")
-        Checkbutton(root, variable=self._grayscale).grid(row=4, column=1)
+        Checkbutton(root, variable=self._grayscale).grid(row=4, column=1, sticky="w")
 
-        Label(root, text="Scroll amount (in clicks negative for up, positive for down):").grid(row=5, column=0, sticky="w")
+        Label(root, text="Scroll amount in clicks:").grid(row=5, column=0, sticky="w")
         Entry(root, textvariable=self._scroll_amount).grid(row=5, column=1)
+        Label(root, justify="left", text="Negative for up\nPositive for down").grid(row=5, column=2, sticky="w")
 
         Button(root, text="Start", command=self._start).grid(row=6, column=0, columnspan=3)
 
